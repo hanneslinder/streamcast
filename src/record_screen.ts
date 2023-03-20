@@ -1,4 +1,4 @@
-import { Message, MessageSender, MessageType } from "./interface";
+import { ExtensionState, Message, MessageSender, MessageType } from "./interface";
 import BitmovinApi, { InputType } from '@bitmovin/api-sdk';
 import { apiKey } from "./key";
 
@@ -6,13 +6,34 @@ const bitmovinApi = new BitmovinApi({apiKey});
 
 chrome.runtime.onMessage.addListener(messageHandler);
 
-async function messageHandler(request: Message, _sender: MessageSender, _sendResponse: (response: Message) => void) {
-  if (request.type === MessageType.StartRecordingOnBackground) {
-    startCapture(request.payload as chrome.tabs.Tab);
+let extensionState: ExtensionState = {
+  isRecording: false,
+  isLoading: false,
+}
+
+startCapture();
+
+async function messageHandler(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
+  if (request.type === MessageType.SetPreviousTabId) {
+    extensionState.lastTabId = request.payload as number;
+  } else if (request.type === MessageType.UpdateState) {
+    sendResponse({
+      type: MessageType.UpdateState,
+      payload: extensionState,
+    });
   }
 };
 
-function startCapture(currentTab: chrome.tabs.Tab) {
+function setState(newState: Partial<ExtensionState>) {
+  extensionState = { ...extensionState, ...newState };
+
+  chrome.runtime.sendMessage({
+    type: MessageType.UpdateState,
+    payload: extensionState,
+  });
+}
+
+function startCapture() {
   chrome.desktopCapture.chooseDesktopMedia(
     ['screen', 'window', "tab"],
     function (streamId) {
@@ -32,8 +53,9 @@ function startCapture(currentTab: chrome.tabs.Tab) {
         audio: false,
         video: videoOptions as any
       }).then(stream => {
-        const mediaRecorder = new MediaRecorder(stream);
+        setState({ isRecording: true });
 
+        const mediaRecorder = new MediaRecorder(stream);
         const chunks: any[] = [];
 
         mediaRecorder.ondataavailable = function(e) {
@@ -48,7 +70,7 @@ function startCapture(currentTab: chrome.tabs.Tab) {
         mediaRecorder.start();
       }).finally(async () => {
         // After all setup, focus on previous tab (where the recording was requested)
-        await chrome.tabs.update(currentTab.id!!, { active: true, selected: true })
+        await chrome.tabs.update(extensionState.lastTabId!!, { active: true, selected: true });
       });
     })
 };
@@ -70,6 +92,7 @@ function download(recordedChunks: BlobPart[]) {
 }
 
 async function uploadFile(file: Blob) {
+  setState({isLoading: true});
   const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test"});
   const inputId = input.id;
   const uploadUrl = input.uploadUrl;
@@ -80,5 +103,6 @@ async function uploadFile(file: Blob) {
   const requestData = {assetUrl, title: "streamcast-test" };
   const stream = await bitmovinApi.streams.video.create(requestData);
 
+  setState({ isRecording: false, isLoading: false, streamId: stream.id });
   console.log(stream);
 }

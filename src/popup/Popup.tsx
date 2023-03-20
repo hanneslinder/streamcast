@@ -7,7 +7,9 @@ function App() {
 
   useEffect(() => {
     chrome.runtime.onMessage.addListener(function (message: Message, sender, sendResponse) {
-      if (message.type === MessageType.SyncState) {
+      if (message.type === MessageType.UpdateState) {
+        console.log("State update");
+        console.log(message.payload);
         setExtensionState({...message.payload as ExtensionState});
       }
     });
@@ -17,7 +19,7 @@ function App() {
 
   const requestInitialState = async () => {
     const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-    const response = await chrome.tabs.sendMessage(tabs[0].id!!, {type: MessageType.SyncState});
+    const response = await chrome.tabs.sendMessage(tabs[0].id!!, {type: MessageType.GetState});
     setExtensionState({...response.payload as ExtensionState});
   };
 
@@ -41,6 +43,7 @@ function App() {
       <div>
         <button onClick={startRecording}>Record</button>
         {extensionState?.streamId && <button onClick={copyStreamUrl}>Copy URL</button>}
+        {extensionState?.isRecording && <div>Recording...</div>}
       </div>
       <div>{extensionState?.isLoading && <span>UPLOADING</span>}</div>
       <div>

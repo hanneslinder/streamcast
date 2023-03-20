@@ -26,10 +26,10 @@ const startRecording = async () => {
         // So we need to wait a bit before sending the message, otherwise we get an error as there is no listener yet.
         setTimeout(() => {
           chrome.tabs.sendMessage(tabId, {
-            type: MessageType.StartRecordingOnBackground,
-            payload: currentTab
+            type: MessageType.SetPreviousTabId,
+            payload: currentTab.id
           });
-        }, 100); // TODO: HACKY HACK
+        }, 1000); // TODO: HACKY HACK
       }
     });
   });
