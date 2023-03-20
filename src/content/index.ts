@@ -1,5 +1,5 @@
 import { Message, MessageSender, MessageType } from "../interface";
-import BitmovinApi from '@bitmovin/api-sdk';
+import BitmovinApi, { DirectFileUploadInput, InputType } from '@bitmovin/api-sdk';
 import { apiKey } from "../key";
 
 const bitmovinApi = new BitmovinApi({apiKey});
@@ -25,6 +25,10 @@ async function messageListener(request: Message, _sender: MessageSender, sendRes
 
   if (request.type === MessageType.StopRecording) {
     stopRecording();
+  }
+
+  if (request.type === MessageType.UploadFile) {
+    uploadFile();
   }
 }
 
@@ -70,4 +74,12 @@ function download() {
   a.download = "test.webm";
   a.click();
   window.URL.revokeObjectURL(url);
+
+  // uploadFile(blob);
+}
+
+async function uploadFile(file?: Blob) {
+  console.log("Upload file test");
+  const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test"});
+  console.log(input);
 }

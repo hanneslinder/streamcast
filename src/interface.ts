@@ -2,6 +2,7 @@ export enum MessageType {
   StartRecording = "StartRecording",
   StopRecording = "StopRecording",
   RecordingActive = "RecordingActive",
+  UploadFile = "UploadFile",
 }
 
 export interface Message {

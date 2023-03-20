@@ -15,24 +15,22 @@ function App() {
     setRecording(true);
   };
 
-  const stopRecording = async () => {
+  const testUpload = async () => {
     const tabs = await chrome.tabs.query({active: true, currentWindow: true});
     const message: Message = {
-      type: MessageType.StopRecording,
+      type: MessageType.UploadFile,
     }
     const response = await chrome.tabs.sendMessage(tabs[0].id!!, message);
-    setRecording(false);
+    console.log(response);
   }
 
   return (
     <main>
       <h3>StreamCast</h3>
       <div>
-        { recording ? 
-          <button onClick={stopRecording}>Stop recording</button> :
-          <button onClick={startRecording}>Start recording</button>
-        }
+        <button onClick={startRecording}>Start recording</button>
       </div>
+      <button onClick={testUpload}>Upload</button>
     </main>
   )
 }
