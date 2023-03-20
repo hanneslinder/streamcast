@@ -24,7 +24,7 @@ function App() {
   const startRecording = async () => {
     const tabs = await chrome.tabs.query({active: true, currentWindow: true});
     const message: Message = {
-      type: MessageType.StartRecording,
+      type: MessageType.StartRecordingOnBackground,
     }
     const response = await chrome.tabs.sendMessage(tabs[0].id!!, message);
   };
@@ -36,7 +36,7 @@ function App() {
 
   const startRecordingInBackground = () => {
     const message: Message = {
-      type: MessageType.StartRecording,
+      type: MessageType.StartRecording
     }
     chrome.runtime.sendMessage(message, function(response) { 
       console.log(response);

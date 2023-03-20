@@ -14,6 +14,9 @@ export default defineConfig(({ mode }) => {
         output: {
           chunkFileNames: 'assets/chunk-[hash].js',
         },
+        input: {
+          welcome: 'record_screen.html',
+        },
       },
     },
 

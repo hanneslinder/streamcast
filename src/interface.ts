@@ -1,4 +1,5 @@
 export enum MessageType {
+  StartRecordingOnBackground = "StartRecordingOnBackground",
   StartRecording = "StartRecording",
   StopRecording = "StopRecording",
   RecordingActive = "RecordingActive",
