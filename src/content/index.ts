@@ -1,5 +1,5 @@
 import { Message, MessageSender, MessageType } from "../interface";
-import BitmovinApi, { DirectFileUploadInput, InputType } from '@bitmovin/api-sdk';
+import BitmovinApi, { DirectFileUploadInput, InputType, StreamsVideoCreateRequest } from '@bitmovin/api-sdk';
 import { apiKey } from "../key";
 
 const bitmovinApi = new BitmovinApi({apiKey});
@@ -75,7 +75,7 @@ function download() {
   a.click();
   window.URL.revokeObjectURL(url);
 
-  // uploadFile(blob);
+  uploadFile(blob);
 }
 
 async function uploadFile(file?: Blob) {
@@ -85,10 +85,10 @@ async function uploadFile(file?: Blob) {
   const uploadUrl = input.uploadUrl;
 
   const response = await fetch(uploadUrl!!, { method: 'PUT', body: file });
-  const json = await response.json();
-  
-  console.log(json);
+  const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`;
 
-  // const requestData: StreamsVideoCreateRequest = {assetUrl: }
-  // bitmovinApi.streams.video.create(requestData);
+  const requestData = {assetUrl, name: "streamcast-test" };
+  const stream = await bitmovinApi.streams.video.create(requestData);
+
+  console.log(stream);
 }
