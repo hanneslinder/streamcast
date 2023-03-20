@@ -7,7 +7,7 @@ function App() {
 
   useEffect(() => {
     chrome.storage.session.onChanged.addListener(onSessionStorageChange);
-    chrome.storage.session.get("extensionState", (result) => setExtensionState(result.extensionState));
+    chrome.storage.session.get("extensionState", ({extensionState}) => setExtensionState(extensionState));
 
     return () => {
       chrome.storage.session.onChanged.removeListener(onSessionStorageChange);
