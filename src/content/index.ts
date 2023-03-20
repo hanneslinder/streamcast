@@ -1,4 +1,8 @@
 import { Message, MessageSender, MessageType } from "../interface";
+import BitmovinApi from '@bitmovin/api-sdk';
+import { apiKey } from "../key";
+
+const bitmovinApi = new BitmovinApi({apiKey});
 
 chrome.runtime.onMessage.addListener(messageListener);
 
@@ -35,6 +39,7 @@ async function startCapture(displayMediaOptions: DisplayMediaStreamOptions) {
   mediaRecorder = new MediaRecorder(captureStream)
   mediaRecorder.ondataavailable = (event) => handleDataAvailable(event);
   mediaRecorder.start();
+
   return captureStream;
 }
 
