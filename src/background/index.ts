@@ -22,6 +22,8 @@ const startRecording = async () => {
       if (tabId === tab.id && info.status === 'complete') {
         chrome.tabs.onUpdated.removeListener(listener);
 
+        // At this point the new tab hasn't loaded its script file yet. 
+        // So we need to wait a bit before sending the message, otherwise we get an error as there is no listener yet.
         setTimeout(() => {
           chrome.tabs.sendMessage(tabId, {
             type: MessageType.StartRecordingOnBackground,
