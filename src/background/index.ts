@@ -1,42 +1,34 @@
-import { ExtensionState, Message, MessageSender, MessageType } from "../interface";
-import BitmovinApi, { InputType } from '@bitmovin/api-sdk';
-import { apiKey } from "../key";
+import { Message, MessageSender, MessageType } from "../interface";
 
 chrome.runtime.onMessage.addListener(messageHandler);
 
 async function messageHandler(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
-  console.log("Background message listener");
-  switch (request.type) {
-    case MessageType.StartRecording:
-      await startCapture();
-      break;
+  if (request.type === MessageType.StartRecording) {
+    startRecording();
   }
-}
+};
 
-async function startCapture() {
-  console.log("Start capture");
-  await chrome.tabs.query({ active: true, lastFocusedWindow: true, currentWindow: true }, async (tabs) => {
+const startRecording = async () => {
+  await chrome.tabs.query({'active': true, 'lastFocusedWindow': true, 'currentWindow': true}, async function (tabs) {
     const currentTab = tabs[0];
-    const tab = await chrome.tabs.create({ 
-      url: chrome.runtime.getURL('record_screen.html'), 
+    const tab = await chrome.tabs.create({
+      url: chrome.runtime.getURL('record_screen.html'),
       pinned: true,
-      active: true
+      active: true,
     });
-    console.log("Got a tab");
-    console.log(tab);
 
+    // Wait for recording screen tab to be loaded and send message to it with the currentTab
     chrome.tabs.onUpdated.addListener(async function listener(tabId, info) {
       if (tabId === tab.id && info.status === 'complete') {
-        console.log("Tab updated");
         chrome.tabs.onUpdated.removeListener(listener);
-  
-        await chrome.tabs.sendMessage(tabId, {
-          type: MessageType.StartRecordingOnBackground,
-          payload: currentTab,
-        });
+
+        setTimeout(() => {
+          chrome.tabs.sendMessage(tabId, {
+            type: MessageType.StartRecordingOnBackground,
+            payload: currentTab
+          });
+        }, 100); // TODO: HACKY HACK
       }
     });
-  })
-}
-
-export const fn = {}
+  });
+};

@@ -21,20 +21,12 @@ function App() {
     setExtensionState({...response.payload as ExtensionState});
   };
 
-  const startRecording = async () => {
-    const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-    const message: Message = {
-      type: MessageType.StartRecordingOnBackground,
-    }
-    const response = await chrome.tabs.sendMessage(tabs[0].id!!, message);
-  };
-
   const copyStreamUrl = () => {
     const url = `https://streams.bitmovin.com/${extensionState?.streamId}/embed`;
     navigator.clipboard.writeText(url);
   };
 
-  const startRecordingInBackground = () => {
+  const startRecording = () => {
     const message: Message = {
       type: MessageType.StartRecording
     }
@@ -47,8 +39,7 @@ function App() {
     <main>
       <h3>StreamCast</h3>
       <div>
-        <button onClick={startRecording}>Start recording</button>
-        <button onClick={startRecordingInBackground}>Start recording in Background</button>
+        <button onClick={startRecording}>Record</button>
         {extensionState?.streamId && <button onClick={copyStreamUrl}>Copy URL</button>}
       </div>
       <div>{extensionState?.isLoading && <span>UPLOADING</span>}</div>

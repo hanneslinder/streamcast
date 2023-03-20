@@ -1,54 +1,59 @@
-import { ExtensionState, Message, MessageSender, MessageType } from "./interface";
+import { Message, MessageSender, MessageType } from "./interface";
 import BitmovinApi, { InputType } from '@bitmovin/api-sdk';
 import { apiKey } from "./key";
 
 const bitmovinApi = new BitmovinApi({apiKey});
-const recordedChunks: BlobPart[] = [];
-
-let mediaRecorder: MediaRecorder;
-let extensionState: ExtensionState = {
-  isRecording: false,
-}
 
 chrome.runtime.onMessage.addListener(messageHandler);
 
-async function messageHandler(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
-  console.log("Background message listener");
-  switch (request.type) {
-    case MessageType.StartRecordingOnBackground:
-      await startCapture(request.payload as string);
-      break;
+async function messageHandler(request: Message, _sender: MessageSender, _sendResponse: (response: Message) => void) {
+  if (request.type === MessageType.StartRecordingOnBackground) {
+    startCapture(request.payload as chrome.tabs.Tab);
   }
-}
+};
 
-async function startCapture(currentTab: string) {
-  const displayMediaOptions: DisplayMediaStreamOptions = { video: true, audio: true }
-  let captureStream: MediaStream;
+function startCapture(currentTab: chrome.tabs.Tab) {
+  chrome.desktopCapture.chooseDesktopMedia(
+    ['screen', 'window', "tab"],
+    function (streamId) {
+      if (streamId == null) {
+        return;
+      }
 
-  captureStream = await navigator.mediaDevices.getDisplayMedia(
-    displayMediaOptions
-  );
+      const videoOptions = {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: streamId,
+        }
+      };
 
-  mediaRecorder = new MediaRecorder(captureStream)
-  mediaRecorder.ondataavailable = (event) => handleDataAvailable(event);
-  mediaRecorder.start();
+      // Once user has chosen screen or window, create a stream from it and start recording
+      navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: videoOptions as any
+      }).then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
 
-  return captureStream;
-}
+        const chunks: any[] = [];
 
-function handleDataAvailable(event: BlobEvent) {
-  if (event.data.size > 0) {
-    recordedChunks.push(event.data);
-    console.log(recordedChunks);
-    download();
-  }
-}
+        mediaRecorder.ondataavailable = function(e) {
+          chunks.push(e.data);
+        };
 
-function stopRecording() {
-  mediaRecorder.stop();
-}
+        mediaRecorder.onstop = async function(e) {
+          download(chunks);
+          stream.getTracks().forEach(track => track.stop());
+        }
 
-function download() {
+        mediaRecorder.start();
+      }).finally(async () => {
+        // After all setup, focus on previous tab (where the recording was requested)
+        await chrome.tabs.update(currentTab.id!!, { active: true, selected: true })
+      });
+    })
+};
+
+function download(recordedChunks: BlobPart[]) {
   const blob = new Blob(recordedChunks, {
     type: "video/webm",
   });
