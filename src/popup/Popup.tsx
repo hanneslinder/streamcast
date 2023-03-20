@@ -34,11 +34,21 @@ function App() {
     navigator.clipboard.writeText(url);
   };
 
+  const startRecordingInBackground = () => {
+    const message: Message = {
+      type: MessageType.StartRecording,
+    }
+    chrome.runtime.sendMessage(message, function(response) { 
+      console.log(response);
+    });
+  }
+
   return (
     <main>
       <h3>StreamCast</h3>
       <div>
         <button onClick={startRecording}>Start recording</button>
+        <button onClick={startRecordingInBackground}>Start recording in Background</button>
         {extensionState?.streamId && <button onClick={copyStreamUrl}>Copy URL</button>}
       </div>
       <div>{extensionState?.isLoading && <span>UPLOADING</span>}</div>

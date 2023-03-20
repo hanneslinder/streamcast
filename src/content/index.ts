@@ -1,5 +1,5 @@
 import { ExtensionState, Message, MessageSender, MessageType } from "../interface";
-import BitmovinApi, { DirectFileUploadInput, InputType, StreamsVideoCreateRequest } from '@bitmovin/api-sdk';
+import BitmovinApi, { InputType } from '@bitmovin/api-sdk';
 import { apiKey } from "../key";
 
 chrome.runtime.onMessage.addListener(messageListener);
@@ -15,19 +15,19 @@ let extensionState: ExtensionState = {
 async function messageListener(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
   console.log("Content Script received message: ", request);
 
-  switch (request.type) {
-    case MessageType.StartRecording:
-      await startCapture();
-      sendResponse({ type: MessageType.RecordingActive });
-      break;
-    case MessageType.StopRecording:
-      stopRecording();
-      break;
-    case MessageType.SyncState:
-      console.log(extensionState);
-      sendResponse({ type: MessageType.SyncState, payload: extensionState });
-      break;
-  }
+  // switch (request.type) {
+  //   case MessageType.StartRecording:
+  //     await startCapture();
+  //     sendResponse({ type: MessageType.RecordingActive });
+  //     break;
+  //   case MessageType.StopRecording:
+  //     stopRecording();
+  //     break;
+  //   case MessageType.SyncState:
+  //     console.log(extensionState);
+  //     sendResponse({ type: MessageType.SyncState, payload: extensionState });
+  //     break;
+  // }
 }
 
 function setState(state: Partial<ExtensionState>) {
