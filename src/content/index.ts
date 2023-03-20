@@ -81,5 +81,14 @@ function download() {
 async function uploadFile(file?: Blob) {
   console.log("Upload file test");
   const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test"});
-  console.log(input);
+  const inputId = input.id;
+  const uploadUrl = input.uploadUrl;
+
+  const response = await fetch(uploadUrl!!, { method: 'PUT', body: file });
+  const json = await response.json();
+  
+  console.log(json);
+
+  // const requestData: StreamsVideoCreateRequest = {assetUrl: }
+  // bitmovinApi.streams.video.create(requestData);
 }
