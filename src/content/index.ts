@@ -84,11 +84,12 @@ async function uploadFile(file?: Blob) {
   const inputId = input.id;
   const uploadUrl = input.uploadUrl;
 
-  const response = await fetch(uploadUrl!!, { method: 'PUT', body: file });
+  await fetch(uploadUrl!!, { method: 'PUT', body: file });
   const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`;
 
   const requestData = {assetUrl, name: "streamcast-test" };
   const stream = await bitmovinApi.streams.video.create(requestData);
 
   console.log(stream);
+  console.log(`https://streams.bitmovin.com/${stream.id}/embed`);
 }
