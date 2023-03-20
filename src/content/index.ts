@@ -1,4 +1,4 @@
-import { Message, MessageSender, MessageType } from "../interface";
+import { ExtensionState, Message, MessageSender, MessageType } from "../interface";
 import BitmovinApi, { DirectFileUploadInput, InputType, StreamsVideoCreateRequest } from '@bitmovin/api-sdk';
 import { apiKey } from "../key";
 
@@ -8,42 +8,55 @@ chrome.runtime.onMessage.addListener(messageListener);
 
 const recordedChunks: BlobPart[] = [];
 let mediaRecorder: MediaRecorder;
-let isRecording = false;
+
+let extensionState: ExtensionState = {
+  isRecording: false,
+}
 
 async function messageListener(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
   console.log("Content Script received message: ", request);
 
-  if (request.type === MessageType.StartRecording) {
-    const options: DisplayMediaStreamOptions = {
-      video: true,
-      audio: true
-    }
-    await startCapture(options);
-
-    sendResponse({ type: MessageType.RecordingActive });
-  }
-
-  if (request.type === MessageType.StopRecording) {
-    stopRecording();
-  }
-
-  if (request.type === MessageType.UploadFile) {
-    uploadFile();
+  switch (request.type) {
+    case MessageType.StartRecording:
+      await startCapture();
+      sendResponse({ type: MessageType.RecordingActive });
+      break;
+    case MessageType.StopRecording:
+      stopRecording();
+      break;
+    case MessageType.SyncState:
+      console.log(extensionState);
+      sendResponse({ type: MessageType.SyncState, payload: extensionState });
+      break;
   }
 }
 
-async function startCapture(displayMediaOptions: DisplayMediaStreamOptions) {
+function setState(state: Partial<ExtensionState>) {
+  extensionState = {...extensionState, ...state};
+
+  const message: Message = {
+    type: MessageType.SyncState,
+    payload: extensionState
+  };
+
+  chrome.runtime.sendMessage(message, function (response) {
+    console.dir(response);
+  });
+}
+
+async function startCapture() {
+  const displayMediaOptions: DisplayMediaStreamOptions = { video: true, audio: true }
   let captureStream: MediaStream;
 
   captureStream = await navigator.mediaDevices.getDisplayMedia(
     displayMediaOptions
   );
 
-  console.log(captureStream);
   mediaRecorder = new MediaRecorder(captureStream)
   mediaRecorder.ondataavailable = (event) => handleDataAvailable(event);
   mediaRecorder.start();
 
+  setState({ isRecording: true });
   return captureStream;
 }
 
@@ -60,6 +73,7 @@ function handleDataAvailable(event: BlobEvent) {
 
 function stopRecording() {
   mediaRecorder.stop();
+  setState({ isRecording: false });
 }
 
 function download() {
@@ -79,7 +93,6 @@ function download() {
 }
 
 async function uploadFile(file?: Blob) {
-  console.log("Upload file test");
   const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test"});
   const inputId = input.id;
   const uploadUrl = input.uploadUrl;
