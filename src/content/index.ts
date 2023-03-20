@@ -61,7 +61,6 @@ async function startCapture() {
 }
 
 function handleDataAvailable(event: BlobEvent) {
-  console.log("data-available");
   if (event.data.size > 0) {
     recordedChunks.push(event.data);
     console.log(recordedChunks);
@@ -73,7 +72,7 @@ function handleDataAvailable(event: BlobEvent) {
 
 function stopRecording() {
   mediaRecorder.stop();
-  setState({ isRecording: false });
+  setState({ isRecording: false, isLoading: true });
 }
 
 function download() {
@@ -102,6 +101,8 @@ async function uploadFile(file?: Blob) {
 
   const requestData = {assetUrl, name: "streamcast-test" };
   const stream = await bitmovinApi.streams.video.create(requestData);
+
+  setState({ streamId: stream.id, isLoading: false });
 
   console.log(stream);
   console.log(`https://streams.bitmovin.com/${stream.id}/embed`);

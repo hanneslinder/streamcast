@@ -13,6 +13,7 @@ export interface Message {
 export interface ExtensionState {
   isRecording: boolean;
   streamId?: string;
+  isLoading?: boolean;
 }
 
 export interface MessageSender {

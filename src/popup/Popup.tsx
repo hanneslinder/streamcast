@@ -29,14 +29,21 @@ function App() {
     const response = await chrome.tabs.sendMessage(tabs[0].id!!, message);
   };
 
+  const copyStreamUrl = () => {
+    const url = `https://streams.bitmovin.com/${extensionState?.streamId}/embed`;
+    navigator.clipboard.writeText(url);
+  };
+
   return (
     <main>
       <h3>StreamCast</h3>
       <div>
         <button onClick={startRecording}>Start recording</button>
-        <button onClick={requestInitialState}>request state</button>
-        {/* {hasStream && <button onClick={copyStreamUrl}>Copy URL</button>} */}
-        <div>{`Is recording? ${extensionState?.isRecording}`}</div>
+        {extensionState?.streamId && <button onClick={copyStreamUrl}>Copy URL</button>}
+      </div>
+      <div>{extensionState?.isLoading && <span>UPLOADING</span>}</div>
+      <div>
+      {extensionState?.streamId && <a href={`https://streams.bitmovin.com/${extensionState?.streamId}/embed`} target="_blank">Go to stream</a> }
       </div>
     </main>
   )
