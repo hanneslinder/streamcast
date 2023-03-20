@@ -4,35 +4,14 @@ import { apiKey } from "./key";
 
 const bitmovinApi = new BitmovinApi({apiKey});
 
-chrome.runtime.onMessage.addListener(messageHandler);
-
-let extensionState: ExtensionState = {
-  isRecording: false,
-  isLoading: false,
-}
-
 startCapture();
 
-async function messageHandler(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
-  if (request.type === MessageType.SetPreviousTabId) {
-    extensionState.lastTabId = request.payload as number;
-  } else if (request.type === MessageType.UpdateState) {
-    sendResponse({
-      type: MessageType.UpdateState,
-      payload: extensionState,
-    });
-  }
-};
-
 function setState(newState: Partial<ExtensionState>) {
-  extensionState = { ...extensionState, ...newState };
-
-  chrome.storage.session.set({ extensionState });
-
-  // chrome.runtime.sendMessage({
-  //   type: MessageType.UpdateState,
-  //   payload: extensionState,
-  // });
+  chrome.storage.session.get("extensionState", (result) => {
+    let extensionState : ExtensionState = { ...result.extensionState, ...newState };
+    console.log(extensionState)
+    chrome.storage.session.set({ extensionState });
+  })
 }
 
 function startCapture() {
@@ -71,8 +50,9 @@ function startCapture() {
 
         mediaRecorder.start();
       }).finally(async () => {
-        // After all setup, focus on previous tab (where the recording was requested)
-        await chrome.tabs.update(extensionState.lastTabId!!, { active: true, selected: true });
+        chrome.storage.session.get("extensionState", ({extensionState}) => {
+          chrome.tabs.update(extensionState.lastTabId!!, { active: true, selected: true });
+        })
       });
     })
 };
