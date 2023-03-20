@@ -29,8 +29,8 @@ function App() {
       <h3>StreamCast</h3>
       <div>
         { recording ? 
-          <button onClick={startRecording}>Start recording</button> : 
-          <button onClick={stopRecording}>Stop recording</button>
+          <button onClick={stopRecording}>Stop recording</button> :
+          <button onClick={startRecording}>Start recording</button>
         }
       </div>
     </main>
