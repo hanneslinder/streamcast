@@ -3,6 +3,7 @@ import { Message, MessageSender, MessageType } from "../interface";
 chrome.runtime.onMessage.addListener(messageListener);
 
 const recordedChunks: BlobPart[] = [];
+let mediaRecorder: MediaRecorder;
 
 async function messageListener(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
   console.log("Content Script received message: ", request);
@@ -16,6 +17,10 @@ async function messageListener(request: Message, _sender: MessageSender, sendRes
 
     sendResponse({ type: MessageType.RecordingActive });
   }
+
+  if (request.type === MessageType.StopRecording) {
+    stopRecording();
+  }
 }
 
 async function startCapture(displayMediaOptions: DisplayMediaStreamOptions) {
@@ -26,7 +31,7 @@ async function startCapture(displayMediaOptions: DisplayMediaStreamOptions) {
   );
 
   console.log(captureStream);
-  const mediaRecorder = new MediaRecorder(captureStream)
+  mediaRecorder = new MediaRecorder(captureStream)
 
   mediaRecorder.ondataavailable = (event) => handleDataAvailable(event);
   return captureStream;
@@ -41,6 +46,10 @@ function handleDataAvailable(event: BlobEvent) {
   } else {
     
   }
+}
+
+function stopRecording() {
+  mediaRecorder.stop();
 }
 
 function download() {
