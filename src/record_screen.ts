@@ -27,10 +27,12 @@ async function messageHandler(request: Message, _sender: MessageSender, sendResp
 function setState(newState: Partial<ExtensionState>) {
   extensionState = { ...extensionState, ...newState };
 
-  chrome.runtime.sendMessage({
-    type: MessageType.UpdateState,
-    payload: extensionState,
-  });
+  chrome.storage.session.set({ extensionState });
+
+  // chrome.runtime.sendMessage({
+  //   type: MessageType.UpdateState,
+  //   payload: extensionState,
+  // });
 }
 
 function startCapture() {

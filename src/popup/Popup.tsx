@@ -6,22 +6,21 @@ function App() {
   const [extensionState, setExtensionState] = useState<ExtensionState>();
 
   useEffect(() => {
-    chrome.runtime.onMessage.addListener(function (message: Message, sender, sendResponse) {
-      if (message.type === MessageType.UpdateState) {
-        console.log("State update");
-        console.log(message.payload);
-        setExtensionState({...message.payload as ExtensionState});
-      }
+    chrome.storage.session.onChanged.addListener(onSessionStorageChange);
+
+    chrome.storage.session.get("extensionState", (result) => {
+      console.log(result);
+      setExtensionState(result.extensionState);
     });
 
-    requestInitialState(); 
+    return () => {
+      chrome.storage.session.onChanged.removeListener(onSessionStorageChange);
+    }
   }, []);
 
-  const requestInitialState = async () => {
-    const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-    const response = await chrome.tabs.sendMessage(tabs[0].id!!, {type: MessageType.GetState});
-    setExtensionState({...response.payload as ExtensionState});
-  };
+  const onSessionStorageChange = (changes: { [key: string]: chrome.storage.StorageChange; }) => {
+    setExtensionState(changes.extensionState.newValue);
+  }
 
   const copyStreamUrl = () => {
     const url = `https://streams.bitmovin.com/${extensionState?.streamId}/embed`;

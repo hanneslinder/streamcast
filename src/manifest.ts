@@ -36,6 +36,7 @@ export default defineManifest({
     "tabs",
     "activeTab",
     "scripting",
-    "desktopCapture"
+    "desktopCapture",
+    "storage"
   ],
 })
