@@ -1,10 +1,5 @@
 export enum MessageType {
-  StartRecordingOnBackground = "StartRecordingOnBackground",
   StartRecording = "StartRecording",
-  StopRecording = "StopRecording",
-  SetPreviousTabId = "SetPreviousTabId",
-  UpdateState = "UpdateState",
-  GetState = "GetState",
 }
 
 export interface Message {
