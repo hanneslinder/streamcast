@@ -13,7 +13,7 @@
 run the command
 
 ```shell
-$ cd streams-cast
+$ cd streamcast
 
 $ npm run dev
 ```
@@ -21,7 +21,7 @@ $ npm run dev
 ### Chrome Extension Developer Mode
 
 1. set your Chrome browser 'Developer mode' up
-2. click 'Load unpacked', and select `streams-cast/build` folder
+2. click 'Load unpacked', and select `streamcast/build` folder
 
 ### Nomal FrontEnd Developer Mode
 

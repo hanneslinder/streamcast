@@ -1,7 +1,7 @@
 import { defineManifest } from '@crxjs/vite-plugin'
 
 export default defineManifest({
-  name: 'streams-cast',
+  name: 'streamcast',
   description: '',
   version: '0.0.1',
   manifest_version: 3,

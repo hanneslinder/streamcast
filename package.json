@@ -1,6 +1,6 @@
 {
-  "name": "streams-cast",
-  "version": "0.0.0",
+  "name": "streamcast",
+  "version": "0.0.1",
   "author": "Hannes Linder",
   "description": "",
   "type": "module",
