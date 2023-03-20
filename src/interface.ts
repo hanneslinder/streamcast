@@ -1,10 +1,12 @@
 export enum MessageType {
-  TEST = "TEST",
+  StartRecording = "StartRecording",
+  StopRecording = "StopRecording",
+  RecordingActive = "RecordingActive",
 }
 
 export interface Message {
   type: MessageType;
-  payload: unknown;
+  payload?: unknown;
 }
 
 export interface MessageSender {
