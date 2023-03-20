@@ -15,12 +15,13 @@ function setState(extensionState: Partial<ExtensionState>) {
 const startRecording = async () => {
   await chrome.tabs.query({'active': true, 'lastFocusedWindow': true, 'currentWindow': true}, async function (tabs) {
     const currentTab = tabs[0];
-    setState({ lastTabId: currentTab.id });
 
-    await chrome.tabs.create({
+    const tab = await chrome.tabs.create({
       url: chrome.runtime.getURL('record_screen.html'),
       pinned: true,
       active: true,
     });
+
+    setState({ lastTabId: currentTab.id, recordingTabId: tab.id });
   });
 };

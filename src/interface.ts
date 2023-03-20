@@ -12,6 +12,7 @@ export interface ExtensionState {
   streamId?: string;
   isLoading?: boolean;
   lastTabId?: number;
+  recordingTabId?: number;
 }
 
 export interface MessageSender {

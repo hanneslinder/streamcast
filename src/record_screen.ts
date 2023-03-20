@@ -46,6 +46,10 @@ function startCapture() {
         mediaRecorder.onstop = async function(e) {
           download(chunks);
           stream.getTracks().forEach(track => track.stop());
+
+          chrome.storage.session.get("extensionState", ({extensionState}) => {
+            chrome.tabs.remove(extensionState.recordingTabId);
+          })
         }
 
         mediaRecorder.start();
