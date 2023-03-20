@@ -4,6 +4,7 @@ chrome.runtime.onMessage.addListener(messageListener);
 
 const recordedChunks: BlobPart[] = [];
 let mediaRecorder: MediaRecorder;
+let isRecording = false;
 
 async function messageListener(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
   console.log("Content Script received message: ", request);
@@ -32,8 +33,8 @@ async function startCapture(displayMediaOptions: DisplayMediaStreamOptions) {
 
   console.log(captureStream);
   mediaRecorder = new MediaRecorder(captureStream)
-
   mediaRecorder.ondataavailable = (event) => handleDataAvailable(event);
+  mediaRecorder.start();
   return captureStream;
 }
 
