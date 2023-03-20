@@ -2,13 +2,12 @@ import { ExtensionState, Message, MessageSender, MessageType } from "../interfac
 import BitmovinApi, { DirectFileUploadInput, InputType, StreamsVideoCreateRequest } from '@bitmovin/api-sdk';
 import { apiKey } from "../key";
 
-const bitmovinApi = new BitmovinApi({apiKey});
-
 chrome.runtime.onMessage.addListener(messageListener);
 
+const bitmovinApi = new BitmovinApi({apiKey});
 const recordedChunks: BlobPart[] = [];
-let mediaRecorder: MediaRecorder;
 
+let mediaRecorder: MediaRecorder;
 let extensionState: ExtensionState = {
   isRecording: false,
 }
@@ -65,8 +64,6 @@ function handleDataAvailable(event: BlobEvent) {
     recordedChunks.push(event.data);
     console.log(recordedChunks);
     download();
-  } else {
-    
   }
 }
 
@@ -91,7 +88,7 @@ function download() {
   uploadFile(blob);
 }
 
-async function uploadFile(file?: Blob) {
+async function uploadFile(file: Blob) {
   const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test"});
   const inputId = input.id;
   const uploadUrl = input.uploadUrl;
@@ -99,11 +96,8 @@ async function uploadFile(file?: Blob) {
   await fetch(uploadUrl!!, { method: 'PUT', body: file });
   const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`;
 
-  const requestData = {assetUrl, name: "streamcast-test" };
+  const requestData = {assetUrl, title: "streamcast-test" };
   const stream = await bitmovinApi.streams.video.create(requestData);
 
   setState({ streamId: stream.id, isLoading: false });
-
-  console.log(stream);
-  console.log(`https://streams.bitmovin.com/${stream.id}/embed`);
 }
