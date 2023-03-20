@@ -2,16 +2,13 @@ import { Message, MessageSender, MessageType, ExtensionState } from "../interfac
 
 chrome.runtime.onMessage.addListener(messageHandler);
 
-let extensionState: ExtensionState;
-
 async function messageHandler(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
   if (request.type === MessageType.StartRecording) {
     startRecording();
   }
 };
 
-function setState(newState: Partial<ExtensionState>) {
-  extensionState = { ...extensionState, ...newState };
+function setState(extensionState: Partial<ExtensionState>) {
   chrome.storage.session.set({ extensionState });
 }
 
