@@ -12,9 +12,6 @@ async function messageHandler(request: Message, _sender: MessageSender, sendResp
 
 function setState(newState: Partial<ExtensionState>) {
   extensionState = { ...extensionState, ...newState };
-
-  console.log("setting extension state")
-  console.log(extensionState)
   chrome.storage.session.set({ extensionState });
 }
 

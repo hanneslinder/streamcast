@@ -24,12 +24,7 @@ function App() {
   };
 
   const startRecording = () => {
-    const message: Message = {
-      type: MessageType.StartRecording
-    }
-    chrome.runtime.sendMessage(message, function(response) { 
-      console.log(response);
-    });
+    chrome.runtime.sendMessage({ type: MessageType.StartRecording });
   }
 
   return (
@@ -42,7 +37,7 @@ function App() {
       </div>
       <div>{extensionState?.isLoading && <span>UPLOADING</span>}</div>
       <div>
-      {extensionState?.streamId && <a href={`https://streams.bitmovin.com/${extensionState?.streamId}/embed`} target="_blank">Go to stream</a> }
+        {extensionState?.streamId && <a href={`https://streams.bitmovin.com/${extensionState?.streamId}/embed`} target="_blank">Go to stream</a>}
       </div>
     </main>
   )
