@@ -1,5 +1,6 @@
 export enum MessageType {
   StartRecording = "StartRecording",
+  StopRecording = "StopRecording",
 }
 
 export interface Message {

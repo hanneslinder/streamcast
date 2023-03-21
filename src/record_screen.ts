@@ -4,6 +4,15 @@ import { apiKey } from "./key";
 import { getState, setState, setStates } from "./utils";
 
 const bitmovinApi = new BitmovinApi({ apiKey });
+let mediaRecorder: MediaRecorder;
+
+chrome.runtime.onMessage.addListener(messageHandler);
+
+async function messageHandler(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
+  if (request.type === MessageType.StopRecording) {
+    stopCapture();
+  }
+};
 
 startCapture();
 
@@ -29,7 +38,7 @@ function startCapture() {
       }).then(stream => {
         setState("isRecording", true)
 
-        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder = new MediaRecorder(stream);
         const chunks: any[] = [];
 
         mediaRecorder.ondataavailable = function (e) {
@@ -92,4 +101,8 @@ async function uploadFile(file: Blob): Promise<StreamsVideoResponse> {
 
   const requestData = { assetUrl, title: "streamcast-test" };
   return bitmovinApi.streams.video.create(requestData);
+}
+
+function stopCapture() {
+  mediaRecorder.stop();
 }
