@@ -35,8 +35,7 @@ export const Settings: React.FC<Props> = ({onClose}) => {
 
   return <div className="popup-settings">
     <button className="icon-button btn-settings" onClick={onClose}><IconClose /></button>
-
-    {didUpdate && <div className="settings-update-msg">Settings updated!</div>}
+    <h3>Settings</h3>
     <div className="settings-container">
       <div className="settings-item">
         <label htmlFor="api-key">Bitmovin API key</label>
@@ -46,5 +45,6 @@ export const Settings: React.FC<Props> = ({onClose}) => {
         </div>
       </div>
     </div>
+    {didUpdate && <div className="settings-update-msg">Settings updated!</div>}
   </div>
 };

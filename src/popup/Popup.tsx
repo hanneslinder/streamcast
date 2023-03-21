@@ -47,6 +47,12 @@ function App() {
     chrome.runtime.sendMessage({ type: MessageType.StopRecording });
   }
 
+  if (showSettings) {
+    return <main>
+      <Settings onClose={() => setShowSettings(false)} />
+    </main>
+  }
+
   return (
     <main>
       <h3>StreamCast</h3>
@@ -60,7 +66,6 @@ function App() {
         {extensionState?.streamId && <a href={`https://streams.bitmovin.com/${extensionState?.streamId}/embed`} target="_blank">Go to stream</a>}
       </div>
       <button className="icon-button btn-settings" onClick={() => setShowSettings(true)}><IconSettings /></button>
-      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
     </main>
   )
 }
