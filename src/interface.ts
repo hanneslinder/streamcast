@@ -1,10 +1,5 @@
 export enum MessageType {
-  StartRecordingOnBackground = "StartRecordingOnBackground",
   StartRecording = "StartRecording",
-  StopRecording = "StopRecording",
-  SetPreviousTabId = "SetPreviousTabId",
-  UpdateState = "UpdateState",
-  GetState = "GetState",
 }
 
 export interface Message {
@@ -13,10 +8,11 @@ export interface Message {
 }
 
 export interface ExtensionState {
-  isRecording: boolean;
+  isRecording?: boolean;
   streamId?: string;
   isLoading?: boolean;
   lastTabId?: number;
+  recordingTabId?: number;
 }
 
 export interface MessageSender {
