@@ -22,7 +22,7 @@ export const IconClipboard = () => <svg xmlns="http://www.w3.org/2000/svg" class
 <path d="M9 14l2 2l4 -4" />
 </svg>
 
-export const IconLink = () => <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-external-link" width="24" height="24" viewBox="0 0 24 24" strokeWidth="1" stroke="#fff" fill="none" strokeLinecap="round" strokeLinejoin="round">
+export const IconLink = () => <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-external-link" width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#fff" fill="none" strokeLinecap="round" strokeLinejoin="round">
 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 <path d="M11 7h-5a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-5" />
 <line x1="10" y1="14" x2="20" y2="4" />
@@ -42,4 +42,11 @@ export const IconCameraOff = () => <svg xmlns="http://www.w3.org/2000/svg" class
 <line x1="3" y1="3" x2="21" y2="21" />
 <path d="M15 11v-1l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -.675 .946" />
 <path d="M10 6h3a2 2 0 0 1 2 2v3m0 4v1a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-8a2 2 0 0 1 2 -2h1" />
+</svg>
+
+export const IconSave = () => <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-device-floppy" width="24" height="24" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#fff" fill="none" strokeLinecap="round" strokeLinejoin="round">
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+<path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" />
+<circle cx="12" cy="14" r="2" />
+<polyline points="14 4 14 8 8 8 8 4" />
 </svg>
