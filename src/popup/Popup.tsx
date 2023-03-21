@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ExtensionState, Message, MessageType } from '../interface';
+import { getState } from '../utils';
 import './Popup.css'
 
 function App() {
@@ -7,15 +8,24 @@ function App() {
 
   useEffect(() => {
     chrome.storage.session.onChanged.addListener(onSessionStorageChange);
-    chrome.storage.session.get("extensionState", ({extensionState}) => setExtensionState(extensionState));
+    getState(["isRecording", "streamId", "isLoading", "lastTabId", "recordingTabId"]).then((result) => setExtensionState({
+      isLoading: result.isLoading,
+      isRecording: result.isRecording,
+      lastTabId: result.lastTabId,
+      recordingTabId: result.recordingTabId,
+      streamId: result.streamId,
+    } as ExtensionState));
 
     return () => {
       chrome.storage.session.onChanged.removeListener(onSessionStorageChange);
     }
   }, []);
 
+
   const onSessionStorageChange = (changes: { [key: string]: chrome.storage.StorageChange; }) => {
-    setExtensionState(changes.extensionState.newValue);
+    Object.keys(changes).forEach( (key) => {
+      setExtensionState({...extensionState, ...{key: changes[key].newValue}});
+    }) 
   }
 
   const copyStreamUrl = () => {
