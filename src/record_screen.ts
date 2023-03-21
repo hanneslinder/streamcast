@@ -123,7 +123,7 @@ async function uploadFile(file: Blob): Promise<StreamsVideoResponse | Error> {
     await fetch(uploadUrl!!, { method: 'PUT', body: file });
     const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`;
 
-    const requestData = { assetUrl, title: "streamcast-test" };
+    const requestData = { assetUrl, title: "StreamCast" };
     return bitmovinApi.streams.video.create(requestData);
   } catch (e: any) {
     console.error(e);
