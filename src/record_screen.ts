@@ -116,7 +116,7 @@ function downloadLocally(blob: Blob) {
 async function uploadFile(file: Blob): Promise<StreamsVideoResponse | Error> {
   setState("isLoading", true);
   try {
-    const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test" });
+    const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "StreamCast" });
     const inputId = input.id;
     const uploadUrl = input.uploadUrl;
 
