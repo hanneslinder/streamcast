@@ -6,10 +6,13 @@
   --color-highlight: #1ab3ff;
   --color-danger: #ff3657;
   --color-success: #194120;
+  --color-text: #242424;
+
 }
 
 html {
   background-color: var(--main-bg-color);
+  color: var(--color-text)
 }
 
 main {
@@ -101,6 +104,10 @@ a {
   line-height: 24px;
 }
 
+.icon-button svg {
+  stroke: var(--color-text);
+}
+
 .popup-button {
   outline: none;
   border: 2px solid var(--color-highlight);
@@ -114,7 +121,7 @@ a {
 }
 
 .popup-button:hover {
-  border: 2px solid #fff;
+  border: 2px solid var(--color-text);
 }
 
 .popup-button svg {
@@ -154,7 +161,8 @@ input[type="text"] {
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  /* :root {
     --main-bg-color: #242424;
-  }
+    --color-text: #eef6f9;
+  } */
 }
