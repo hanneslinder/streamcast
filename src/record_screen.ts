@@ -1,7 +1,7 @@
 import { ExtensionState, Message, MessageSender, MessageType } from "./interface";
-import BitmovinApi, { InputType } from '@bitmovin/api-sdk';
+import BitmovinApi, { InputType, StreamsVideoResponse } from '@bitmovin/api-sdk';
 import { apiKey } from "./key";
-import { getState, setState } from "./utils";
+import { getState, setState, setStates } from "./utils";
 
 const bitmovinApi = new BitmovinApi({ apiKey });
 
@@ -46,10 +46,17 @@ function startCapture() {
           });
 
           downloadLocally(blob)
-          uploadFile(blob);          
-
-          getState("recordingTabId").then((result) => {
-            chrome.tabs.remove(result.recordingTabId);
+          uploadFile(blob).then((result) => {
+            setStates({
+              "streamId": result.id,
+              "isLoading": false
+            }, () => {
+              setTimeout(() => {
+                getState("recordingTabId").then((result) => {
+                  chrome.tabs.remove(result.recordingTabId)
+                })
+              }, 5000)
+            })
           })
         }
 
@@ -73,23 +80,15 @@ function downloadLocally(blob: Blob) {
   window.URL.revokeObjectURL(url);
 }
 
-async function uploadFile(file: Blob) {
-  setState("isLoading", true).then(async () => {
-    const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test" });
-    const inputId = input.id;
-    const uploadUrl = input.uploadUrl;
-  
-    await fetch(uploadUrl!!, { method: 'PUT', body: file });
-    const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`;
-  
-    const requestData = { assetUrl, title: "streamcast-test" };
-    const stream = await bitmovinApi.streams.video.create(requestData);
-  
-    setState("isLoading", false);
-    setState("streamId", stream.id);
-    chrome.action.setIcon({ path: "/icons/streams-icon-web.png" });
-    console.log(stream);
-  });
-}
+async function uploadFile(file: Blob): Promise<StreamsVideoResponse> {
+  setState("isLoading", true)
+  const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test" });
+  const inputId = input.id;
+  const uploadUrl = input.uploadUrl;
 
-  
+  await fetch(uploadUrl!!, { method: 'PUT', body: file });
+  const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`;
+
+  const requestData = { assetUrl, title: "streamcast-test" };
+  return bitmovinApi.streams.video.create(requestData);
+}

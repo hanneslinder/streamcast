@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ExtensionState, Message, MessageType } from '../interface';
-import { getState } from '../utils';
+import { getState, setState } from '../utils';
 import './Popup.css'
 
 function App() {
@@ -22,7 +22,9 @@ function App() {
   }, []);
 
 
+
   const onSessionStorageChange = (changes: { [key: string]: chrome.storage.StorageChange; }) => {
+    console.log(changes)
     Object.keys(changes).forEach( (key) => {
       setExtensionState({...extensionState, ...{key: changes[key].newValue}});
     }) 
