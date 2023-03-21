@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ExtensionState, Message, MessageType } from '../interface';
-import { getState, setState } from '../utils';
+import { clearState, getState, setState } from '../utils';
 import './Popup.css'
 
 function App() {
@@ -8,26 +8,27 @@ function App() {
 
   useEffect(() => {
     chrome.storage.session.onChanged.addListener(onSessionStorageChange);
-    getState(["isRecording", "streamId", "isLoading", "lastTabId", "recordingTabId"]).then((result) => setExtensionState({
-      isLoading: result.isLoading,
-      isRecording: result.isRecording,
-      lastTabId: result.lastTabId,
-      recordingTabId: result.recordingTabId,
-      streamId: result.streamId,
-    } as ExtensionState));
+    getState(["isRecording", "streamId", "isLoading", "lastTabId", "recordingTabId"]).then((result) => {
+      setExtensionState({
+        isLoading: result.isLoading,
+        isRecording: result.isRecording,
+        lastTabId: result.lastTabId,
+        recordingTabId: result.recordingTabId,
+        streamId: result.streamId,
+      } as ExtensionState)
+    });
 
     return () => {
       chrome.storage.session.onChanged.removeListener(onSessionStorageChange);
     }
   }, []);
 
-
-
   const onSessionStorageChange = (changes: { [key: string]: chrome.storage.StorageChange; }) => {
-    console.log(changes)
-    Object.keys(changes).forEach( (key) => {
-      setExtensionState({...extensionState, ...{key: changes[key].newValue}});
-    }) 
+    const newState = {...extensionState};
+    Object.keys(changes).forEach((key) => {
+      newState[key as keyof ExtensionState] = changes[key].newValue;
+    });
+    setExtensionState(newState);
   }
 
   const copyStreamUrl = () => {
@@ -48,6 +49,7 @@ function App() {
         {extensionState?.isRecording && <div>Recording...</div>}
       </div>
       <div>{extensionState?.isLoading && <span>UPLOADING</span>}</div>
+      {/* <div><button onClick={() => clearState()}>Clear state</button></div> */}
       <div>
         {extensionState?.streamId && <a href={`https://streams.bitmovin.com/${extensionState?.streamId}/embed`} target="_blank">Go to stream</a>}
       </div>

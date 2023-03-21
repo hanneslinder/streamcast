@@ -11,3 +11,7 @@ export function setStates(items: { [key: string]: any }, callback : () => void =
 export function getState(keys: keyof ExtensionState | Array<keyof ExtensionState>): Promise<{[key: string]: any}> {
   return chrome.storage.session.get(keys);
 }
+
+export function clearState(callback : () => void = () => {}) {
+  chrome.storage.session.clear(callback);
+}
