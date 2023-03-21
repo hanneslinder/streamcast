@@ -108,7 +108,7 @@ function downloadLocally(blob: Blob) {
   document.body.appendChild(a);
   a.setAttribute("style", "display: none");
   a.href = url;
-  a.download = "test.webm";
+  a.download = "StreamCast.webm";
   a.click();
   window.URL.revokeObjectURL(url);
 }
