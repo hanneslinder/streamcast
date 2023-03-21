@@ -1,6 +1,5 @@
 import { ExtensionState, Message, MessageSender, MessageType } from "./interface";
 import BitmovinApi, { InputType, StreamsVideoResponse } from '@bitmovin/api-sdk';
-import { apiKey } from "./key";
 import { getApiKey, getState, setState, setStates } from "./utils";
 
 let bitmovinApi: BitmovinApi;
