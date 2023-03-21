@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ExtensionState, MessageType } from '../interface';
 import { getApiKey, getState, setState, storeApiKey } from '../utils';
-import { IconSettings } from './Icons';
+import { IconCamera, IconCameraOff, IconCheck, IconClipboard, IconLink, IconSettings } from './Icons';
 import './Popup.css'
 import { Settings } from './Settings';
 
@@ -49,6 +49,11 @@ function App() {
     chrome.runtime.sendMessage({ type: MessageType.StopRecording });
   }
 
+  const goToStream = (streamId: string) => {
+    const url = `https://streams.bitmovin.com/${streamId}/embed`;
+    window.open(url, "_blank");
+  }
+
   if (showSettings) {
     return <main>
       <Settings onClose={() => setShowSettings(false)} />
@@ -59,19 +64,29 @@ function App() {
     return <div className="popup-error">{error}</div>
   }
 
+  const renderStreamInfo = (streamId: string) => {
+    return <div className="popup-streaminfo">
+      <div>
+        <IconCheck />
+        <span className="popup-streaminfo-message">Successfully created a new Stream</span>
+      </div>
+      <div className="popup-streaminfo-buttons">
+        <button className="popup-button btn-copy" onClick={copyStreamUrl}><IconClipboard />Copy URL</button>
+        <button className="popup-button btn-link" onClick={() => goToStream(streamId)}><IconLink />Go to stream</button>
+      </div>
+    </div>
+  }
+
   return (
     <main>
       <h3>StreamCast</h3>
-      <div>
-        {extensionState?.isRecording ? <button className="text-button btn-stop" onClick={stopRecording}>Stop</button> : <button className="text-button btn-start" onClick={startRecording}>Record</button>}
-        {extensionState?.streamId && <button className="text-button btn-copy" onClick={copyStreamUrl}>Copy URL</button>}
-        {extensionState?.isRecording && <div>Recording...</div>}
+      <div className="popup-start-stop-buttons">
+        {extensionState?.isRecording ? <button className="popup-button btn-stop" onClick={stopRecording}><IconCameraOff />Stop</button> : <button className="popup-button btn-start" onClick={startRecording}><IconCamera /> Record</button>}
       </div>
+      {extensionState?.isRecording && <div>Recording...</div>}
+      {extensionState?.streamId && !extensionState?.isRecording && renderStreamInfo(extensionState.streamId)}
       <div>{extensionState?.isLoading && <span>UPLOADING</span>}</div>
       {extensionState?.error && renderError(extensionState.error) }
-      <div>
-        {extensionState?.streamId && <a href={`https://streams.bitmovin.com/${extensionState?.streamId}/embed`} target="_blank">Go to stream</a>}
-      </div>
       <button className="icon-button btn-settings" onClick={() => setShowSettings(true)}><IconSettings /></button>
     </main>
   )
