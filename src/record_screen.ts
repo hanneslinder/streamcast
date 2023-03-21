@@ -47,6 +47,7 @@ function startCapture() {
 
           downloadLocally(blob)
           uploadFile(blob).then((result) => {
+            chrome.action.setIcon({ path: "/icons/streams-icon-web.png" });
             setStates({
               "streamId": result.id,
               "isLoading": false
@@ -55,14 +56,13 @@ function startCapture() {
                 getState("recordingTabId").then((result) => {
                   chrome.tabs.remove(result.recordingTabId)
                 })
-              }, 5000)
+              }, 10)
             })
           })
         }
 
         mediaRecorder.start();
       }).finally(async () => {
-        chrome.action.setIcon({ path: "/icons/streams-icon-web.png" });
         getState("lastTabId").then((result) => {
           chrome.tabs.update(result.lastTabId!!, { active: true, selected: true });
         });
