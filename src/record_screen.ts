@@ -57,7 +57,7 @@ function startCapture() {
       }).finally(async () => {
         getState("lastTabId").then((result) => {
           chrome.tabs.update(result.lastTabId!!, { active: true, selected: true });
-        })
+        });
       });
     })
 };
@@ -87,8 +87,9 @@ async function uploadFile(file: Blob) {
   
     setState("isLoading", false);
     setState("streamId", stream.id);
+    chrome.action.setIcon({ path: "/icons/streams-icon-web.png" });
     console.log(stream);
-  })
+  });
 }
 
   
