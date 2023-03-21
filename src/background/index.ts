@@ -21,6 +21,7 @@ const startRecording = async () => {
       active: true,
     });
 
+    chrome.action.setIcon({ path: "/icons/streams-icon-web-active.png" });
     setState("recordingTabId", tab.id);
   });
 };
