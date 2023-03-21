@@ -7,7 +7,7 @@
   --color-danger: #ff3657;
   --color-success: #194120;
   --color-text: #242424;
-
+  --color-highlight-2: #1d698f;
 }
 
 html {
@@ -121,7 +121,7 @@ a {
 }
 
 .popup-button:hover {
-  border: 2px solid var(--color-text);
+  border: 2px solid var(--color-highlight-2);
 }
 
 .popup-button svg {
@@ -161,8 +161,9 @@ input[type="text"] {
 }
 
 @media (prefers-color-scheme: dark) {
-  /* :root {
+  :root {
     --main-bg-color: #242424;
     --color-text: #eef6f9;
-  } */
+    --color-highlight-2: #eef6f975;
+  }
 }
