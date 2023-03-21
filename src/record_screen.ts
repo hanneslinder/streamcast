@@ -24,6 +24,8 @@ function setupApi() {
 }
 
 function startCapture() {
+  setState("error", undefined);
+  
   chrome.desktopCapture.chooseDesktopMedia(
     ['screen', 'window', "tab"],
     function (streamId) {
@@ -50,7 +52,7 @@ function startCapture() {
         audio: false,
         video: videoOptions as any
       }).then(stream => {
-        setState("isRecording", true)
+        setState("isRecording", true); 
 
         mediaRecorder = new MediaRecorder(stream);
         const chunks: any[] = [];
@@ -70,16 +72,26 @@ function startCapture() {
 
           downloadLocally(blob)
           uploadFile(blob).then(async (result) => {
+            let newState;
+            if (result instanceof Error) {
+              newState = {
+                "isLoading": false,
+                "error": "Something went wrong",
+              }
+            } else {
+              newState = {
+                "streamId": result.id,
+                "isLoading": false
+              }
+            }
+
             await chrome.action.setIcon({ path: "/icons/streams-icon-web.png" });
-            setStates({
-              "streamId": result.id,
-              "isLoading": false
-            }, () => {
-              getState("recordingTabId").then((result) => {
-                chrome.tabs.remove(result.recordingTabId)
+              setStates(newState, () => {
+                getState("recordingTabId").then((result) => {
+                  chrome.tabs.remove(result.recordingTabId)
+                })
               })
-            })
-          })
+          });
         }
 
         mediaRecorder.start();
@@ -102,17 +114,22 @@ function downloadLocally(blob: Blob) {
   window.URL.revokeObjectURL(url);
 }
 
-async function uploadFile(file: Blob): Promise<StreamsVideoResponse> {
-  setState("isLoading", true)
-  const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test" });
-  const inputId = input.id;
-  const uploadUrl = input.uploadUrl;
+async function uploadFile(file: Blob): Promise<StreamsVideoResponse | Error> {
+  setState("isLoading", true);
+  try {
+    const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "streamcast-test" });
+    const inputId = input.id;
+    const uploadUrl = input.uploadUrl;
 
-  await fetch(uploadUrl!!, { method: 'PUT', body: file });
-  const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`;
+    await fetch(uploadUrl!!, { method: 'PUT', body: file });
+    const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`;
 
-  const requestData = { assetUrl, title: "streamcast-test" };
-  return bitmovinApi.streams.video.create(requestData);
+    const requestData = { assetUrl, title: "streamcast-test" };
+    return bitmovinApi.streams.video.create(requestData);
+  } catch (e: any) {
+    console.error(e);
+    return new Error("Something went wrong");
+  }
 }
 
 function stopCapture() {

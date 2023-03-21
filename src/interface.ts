@@ -14,6 +14,7 @@ export interface ExtensionState {
   isLoading?: boolean;
   lastTabId?: number;
   recordingTabId?: number;
+  error?: string;
 }
 
 export interface MessageSender {
