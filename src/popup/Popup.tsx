@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ExtensionState, MessageType } from '../interface';
-import { getApiKey, getState, storeApiKey } from '../utils';
+import { getApiKey, getState, setState, storeApiKey } from '../utils';
 import { IconSettings } from './Icons';
 import './Popup.css'
 import { Settings } from './Settings';
@@ -11,13 +11,14 @@ function App() {
 
   useEffect(() => {
     chrome.storage.session.onChanged.addListener(onSessionStorageChange);
-    getState(["isRecording", "streamId", "isLoading", "lastTabId", "recordingTabId"]).then((result) => {
+    getState(["isRecording", "streamId", "isLoading", "lastTabId", "recordingTabId", "error"]).then((result) => {
       setExtensionState({
         isLoading: result.isLoading,
         isRecording: result.isRecording,
         lastTabId: result.lastTabId,
         recordingTabId: result.recordingTabId,
         streamId: result.streamId,
+        error: result.error,
       } as ExtensionState)
     });
 
@@ -40,6 +41,7 @@ function App() {
   };
 
   const startRecording = () => {
+    setState("error", "");
     chrome.runtime.sendMessage({ type: MessageType.StartRecording });
   }
 
@@ -53,6 +55,10 @@ function App() {
     </main>
   }
 
+  const renderError = (error: string) => {
+    return <div className="popup-error">{error}</div>
+  }
+
   return (
     <main>
       <h3>StreamCast</h3>
@@ -62,6 +68,7 @@ function App() {
         {extensionState?.isRecording && <div>Recording...</div>}
       </div>
       <div>{extensionState?.isLoading && <span>UPLOADING</span>}</div>
+      {extensionState?.error && renderError(extensionState.error) }
       <div>
         {extensionState?.streamId && <a href={`https://streams.bitmovin.com/${extensionState?.streamId}/embed`} target="_blank">Go to stream</a>}
       </div>
