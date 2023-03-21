@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ExtensionState, Message, MessageType } from '../interface';
-import { clearState, getState, setState } from '../utils';
+import { ExtensionState, MessageType } from '../interface';
+import { getState } from '../utils';
 import './Popup.css'
 
 function App() {
@@ -40,11 +40,15 @@ function App() {
     chrome.runtime.sendMessage({ type: MessageType.StartRecording });
   }
 
+  const stopRecording = () => {
+    chrome.runtime.sendMessage({ type: MessageType.StopRecording });
+  }
+
   return (
     <main>
       <h3>StreamCast</h3>
       <div>
-        <button onClick={startRecording}>Record</button>
+        {extensionState?.isRecording ? <button onClick={stopRecording}>Stop</button> : <button onClick={startRecording}>Record</button>}
         {extensionState?.streamId && <button onClick={copyStreamUrl}>Copy URL</button>}
         {extensionState?.isRecording && <div>Recording...</div>}
       </div>
