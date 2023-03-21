@@ -20,10 +20,17 @@ function startCapture() {
   chrome.desktopCapture.chooseDesktopMedia(
     ['screen', 'window', "tab"],
     function (streamId) {
-      if (streamId == null) {
+      if (!streamId) {
+        getState("lastTabId").then(async (result) => {
+          await chrome.tabs.update(result.lastTabId!!, { active: true, selected: true });
+
+          getState("recordingTabId").then( (result) => {
+            chrome.tabs.remove(result.recordingTabId)
+          })
+        });
+       
         return;
       }
-
       const videoOptions = {
         mandatory: {
           chromeMediaSource: 'desktop',
@@ -69,11 +76,10 @@ function startCapture() {
         }
 
         mediaRecorder.start();
-      }).finally(async () => {
         getState("lastTabId").then((result) => {
           chrome.tabs.update(result.lastTabId!!, { active: true, selected: true });
         });
-      });
+      })
     })
 };
 
