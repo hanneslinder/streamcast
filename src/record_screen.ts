@@ -76,6 +76,7 @@ function startCapture() {
         }
 
         mediaRecorder.start();
+        chrome.action.setIcon({ path: "/icons/streams-icon-web-active.png" });
         getState("lastTabId").then((result) => {
           chrome.tabs.update(result.lastTabId!!, { active: true, selected: true });
         });
