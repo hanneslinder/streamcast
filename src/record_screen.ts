@@ -19,7 +19,6 @@ startCapture();
 
 function setupApi() {
   getApiKey().then(apiKey => {
-    console.log("Setup api with key", apiKey);
     bitmovinApi = new BitmovinApi({ apiKey });
   });
 }

@@ -51,16 +51,15 @@ function App() {
     <main>
       <h3>StreamCast</h3>
       <div>
-        {extensionState?.isRecording ? <button onClick={stopRecording}>Stop</button> : <button onClick={startRecording}>Record</button>}
-        {extensionState?.streamId && <button onClick={copyStreamUrl}>Copy URL</button>}
+        {extensionState?.isRecording ? <button className="text-button btn-stop" onClick={stopRecording}>Stop</button> : <button className="text-button btn-start" onClick={startRecording}>Record</button>}
+        {extensionState?.streamId && <button className="text-button btn-copy" onClick={copyStreamUrl}>Copy URL</button>}
         {extensionState?.isRecording && <div>Recording...</div>}
       </div>
       <div>{extensionState?.isLoading && <span>UPLOADING</span>}</div>
-      {/* <div><button onClick={() => clearState()}>Clear state</button></div> */}
       <div>
         {extensionState?.streamId && <a href={`https://streams.bitmovin.com/${extensionState?.streamId}/embed`} target="_blank">Go to stream</a>}
       </div>
-      <button className="popup-btn btn-settings" onClick={() => setShowSettings(true)}><IconSettings /></button>
+      <button className="icon-button btn-settings" onClick={() => setShowSettings(true)}><IconSettings /></button>
       {showSettings && <Settings onClose={() => setShowSettings(false)} />}
     </main>
   )
