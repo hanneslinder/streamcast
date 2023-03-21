@@ -1,9 +1,9 @@
 import { ExtensionState, Message, MessageSender, MessageType } from "./interface";
 import BitmovinApi, { InputType, StreamsVideoResponse } from '@bitmovin/api-sdk';
 import { apiKey } from "./key";
-import { getState, setState, setStates } from "./utils";
+import { getApiKey, getState, setState, setStates } from "./utils";
 
-const bitmovinApi = new BitmovinApi({ apiKey });
+let bitmovinApi: BitmovinApi;
 let mediaRecorder: MediaRecorder;
 
 chrome.runtime.onMessage.addListener(messageHandler);
@@ -14,7 +14,15 @@ async function messageHandler(request: Message, _sender: MessageSender, sendResp
   }
 };
 
+setupApi();
 startCapture();
+
+function setupApi() {
+  getApiKey().then(apiKey => {
+    console.log("Setup api with key", apiKey);
+    bitmovinApi = new BitmovinApi({ apiKey });
+  });
+}
 
 function startCapture() {
   chrome.desktopCapture.chooseDesktopMedia(

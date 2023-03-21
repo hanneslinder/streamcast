@@ -15,3 +15,12 @@ export function getState(keys: keyof ExtensionState | Array<keyof ExtensionState
 export function clearState(callback : () => void = () => {}) {
   chrome.storage.session.clear(callback);
 }
+
+export function storeApiKey(apiKey: string) {
+  chrome.storage.sync.set({apiKey}, () => {});
+}
+
+export async function getApiKey() {
+  const key = await chrome.storage.sync.get("apiKey");
+  return key.apiKey;
+}
