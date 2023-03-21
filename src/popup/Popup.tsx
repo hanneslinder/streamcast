@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ExtensionState, MessageType } from '../interface';
-import { getState } from '../utils';
+import { getApiKey, getState, storeApiKey } from '../utils';
+import { IconSettings } from './Icons';
 import './Popup.css'
+import { Settings } from './Settings';
 
 function App() {
   const [extensionState, setExtensionState] = useState<ExtensionState>();
+  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   useEffect(() => {
     chrome.storage.session.onChanged.addListener(onSessionStorageChange);
@@ -57,6 +60,8 @@ function App() {
       <div>
         {extensionState?.streamId && <a href={`https://streams.bitmovin.com/${extensionState?.streamId}/embed`} target="_blank">Go to stream</a>}
       </div>
+      <button className="popup-btn btn-settings" onClick={() => setShowSettings(true)}><IconSettings /></button>
+      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
     </main>
   )
 }
