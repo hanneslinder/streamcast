@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { clearState, getApiKey, getState, storeApiKey } from "../utils";
-import { IconClose } from "./Icons";
+import { IconClose, IconSave } from "./Icons";
 
 interface Props {
   onClose: () => void;
@@ -39,12 +39,10 @@ export const Settings: React.FC<Props> = ({onClose}) => {
     <div className="settings-container">
       <div className="settings-item">
         <label htmlFor="api-key">Bitmovin API key</label>
-        <div>
-          <input id="api-key" type="text" value={apiKey} onChange={e => setApiKey(e.target.value)} />
-          <button className="text-button" onClick={updateApiKey}>Save</button>
-        </div>
+        <input id="api-key" type="text" value={apiKey} onChange={e => setApiKey(e.target.value)} />
       </div>
     </div>
+    <button className="popup-button btn-save-settings" onClick={updateApiKey}><IconSave />Save</button>
     {didUpdate && <div className="settings-update-msg">Settings updated!</div>}
   </div>
 };

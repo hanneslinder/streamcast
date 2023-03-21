@@ -48,8 +48,9 @@ a {
 .settings-container {
   display: flex;
   align-items: center;
-  justify-content: center;
   width: 100%;
+  margin-bottom: 20px;
+  font-size: 1.2em;
 }
 
 .settings-update-msg {
@@ -59,6 +60,7 @@ a {
 .settings-item {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .settings-item button {
@@ -71,14 +73,6 @@ a {
   flex-direction: column;
   border-radius: 4px;
   margin-top: 20px;
-}
-
-.popup-streaminfo .icon-button {
-  /* justify-content: space-around;
-  background: var(--color-highlight);
-  width: 120px;
-  border-radius: 4px;
-  padding: 6px 4px; */
 }
 
 .popup-streaminfo-message {
@@ -116,6 +110,7 @@ a {
   display: flex;
   align-items: center;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .popup-button:hover {
