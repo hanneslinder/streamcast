@@ -1,136 +1,139 @@
-import { ExtensionState, Message, MessageSender, MessageType } from "./interface";
-import BitmovinApi, { InputType, StreamsVideoResponse } from '@bitmovin/api-sdk';
-import { getApiKey, getState, setState, setStates } from "./utils";
+import { Message, MessageSender, MessageType } from './interface'
+import BitmovinApi, { InputType, StreamsVideoResponse } from '@bitmovin/api-sdk'
+import { getApiKey, getState, setState, setStates } from './utils'
 
-let bitmovinApi: BitmovinApi;
-let mediaRecorder: MediaRecorder;
+let bitmovinApi: BitmovinApi
+let mediaRecorder: MediaRecorder
 
-chrome.runtime.onMessage.addListener(messageHandler);
+chrome.runtime.onMessage.addListener(messageHandler)
 
 async function messageHandler(request: Message, _sender: MessageSender, sendResponse: (response: Message) => void) {
-  if (request.type === MessageType.StopRecording) {
-    stopCapture();
-  }
-};
+	if (request.type === MessageType.StopRecording) {
+		stopCapture()
+	}
+}
 
-setupApi();
-startCapture();
+setupApi()
+startCapture()
 
 function setupApi() {
-  getApiKey().then(apiKey => {
-    bitmovinApi = new BitmovinApi({ apiKey });
-  });
+	getApiKey().then((apiKey) => {
+		bitmovinApi = new BitmovinApi({ apiKey })
+	})
 }
 
 function startCapture() {
-  setState("error", undefined);
-  
-  chrome.desktopCapture.chooseDesktopMedia(
-    ['screen', 'window', "tab"],
-    function (streamId) {
-      if (!streamId) {
-        getState("lastTabId").then(async (result) => {
-          await chrome.tabs.update(result.lastTabId!!, { active: true, selected: true });
+	setState('error', undefined)
 
-          getState("recordingTabId").then( (result) => {
-            chrome.tabs.remove(result.recordingTabId)
-          })
-        });
-       
-        return;
-      }
-      const videoOptions = {
-        mandatory: {
-          chromeMediaSource: 'desktop',
-          chromeMediaSourceId: streamId,
-        }
-      };
+	chrome.desktopCapture.chooseDesktopMedia(['screen', 'window', 'tab'], function (streamId) {
+		if (!streamId) {
+			getState('lastTabId').then(async (result) => {
+				await chrome.tabs.update(result.lastTabId!!, { active: true, selected: true })
 
-      // Once user has chosen screen or window, create a stream from it and start recording
-      navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: videoOptions as any
-      }).then(stream => {
-        setState("isRecording", true); 
+				getState('recordingTabId').then((result) => {
+					chrome.tabs.remove(result.recordingTabId)
+				})
+			})
 
-        mediaRecorder = new MediaRecorder(stream);
-        const chunks: any[] = [];
+			return
+		}
+		const videoOptions = {
+			mandatory: {
+				chromeMediaSource: 'desktop',
+				chromeMediaSourceId: streamId,
+			},
+		}
 
-        mediaRecorder.ondataavailable = function (e) {
-          chunks.push(e.data);
-        };
+		// Once user has chosen screen or window, create a stream from it and start recording
+		navigator.mediaDevices
+			.getUserMedia({
+				audio: false,
+				video: videoOptions as any,
+			})
+			.then((stream) => {
+				setState('isRecording', true)
 
-        mediaRecorder.onstop = async function (e) {
-          stream.getTracks().forEach(track => track.stop());
+				mediaRecorder = new MediaRecorder(stream)
+				const chunks: any[] = []
 
-          setState("isRecording", false);
+				mediaRecorder.ondataavailable = function (e) {
+					chunks.push(e.data)
+				}
 
-          const blob = new Blob(chunks, {
-            type: "video/webm",
-          });
+				mediaRecorder.onstop = async function (e) {
+					stream.getTracks().forEach((track) => track.stop())
 
-          downloadLocally(blob)
-          uploadFile(blob).then(async (result) => {
-            let newState;
-            if (result instanceof Error) {
-              newState = {
-                "isLoading": false,
-                "error": "Something went wrong",
-              }
-            } else {
-              newState = {
-                "streamId": result.id,
-                "isLoading": false
-              }
-            }
+					setState('isRecording', false)
 
-            await chrome.action.setIcon({ path: "/icons/streams-icon-web.png" });
-              setStates(newState, () => {
-                getState("recordingTabId").then((result) => {
-                  chrome.tabs.remove(result.recordingTabId)
-                })
-              })
-          });
-        }
+					const blob = new Blob(chunks, {
+						type: 'video/webm',
+					})
 
-        mediaRecorder.start();
-        chrome.action.setIcon({ path: "/icons/streams-icon-web-active.png" });
-        getState("lastTabId").then((result) => {
-          chrome.tabs.update(result.lastTabId!!, { active: true, selected: true });
-        });
-      })
-    })
-};
+					downloadLocally(blob)
+					uploadFile(blob).then(async (result) => {
+						let newState
+						if (result instanceof Error) {
+							newState = {
+								isLoading: false,
+								error: 'Something went wrong',
+							}
+						} else {
+							newState = {
+								streamId: result.id,
+								isLoading: false,
+							}
+						}
+
+						await chrome.action.setIcon({ path: '/icons/streams-icon-web.png' })
+						setStates(newState, () => {
+							getState('recordingTabId').then((result) => {
+								chrome.tabs.remove(result.recordingTabId)
+							})
+						})
+					})
+				}
+
+				mediaRecorder.start()
+				chrome.action.setIcon({ path: '/icons/streams-icon-web-active.png' })
+				getState('lastTabId').then((result) => {
+					chrome.tabs.update(result.lastTabId!!, { active: true, selected: true })
+				})
+			})
+	})
+}
 
 function downloadLocally(blob: Blob) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  document.body.appendChild(a);
-  a.setAttribute("style", "display: none");
-  a.href = url;
-  a.download = "StreamCast.webm";
-  a.click();
-  window.URL.revokeObjectURL(url);
+	const url = URL.createObjectURL(blob)
+	const a = document.createElement('a')
+	document.body.appendChild(a)
+	a.setAttribute('style', 'display: none')
+	a.href = url
+	a.download = 'StreamCast.webm'
+	a.click()
+	window.URL.revokeObjectURL(url)
 }
 
 async function uploadFile(file: Blob): Promise<StreamsVideoResponse | Error> {
-  setState("isLoading", true);
-  try {
-    const input = await bitmovinApi.encoding.inputs.directFileUpload.create({ type: InputType.DIRECT_FILE_UPLOAD, name: "StreamCast" });
-    const inputId = input.id;
-    const uploadUrl = input.uploadUrl;
+	setState('isLoading', true)
+	try {
+		const input = await bitmovinApi.encoding.inputs.directFileUpload.create({
+			type: InputType.DIRECT_FILE_UPLOAD,
+			name: 'StreamCast',
+		})
+		const inputId = input.id
+		const uploadUrl = input.uploadUrl
 
-    await fetch(uploadUrl!!, { method: 'PUT', body: file });
-    const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`;
+		await fetch(uploadUrl!!, { method: 'PUT', body: file })
+		const assetUrl = `https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload/${inputId}`
 
-    const requestData = { assetUrl, title: "StreamCast" };
-    return bitmovinApi.streams.video.create(requestData);
-  } catch (e: any) {
-    console.error(e);
-    return new Error("Something went wrong");
-  }
+		const requestData = { assetUrl, title: 'StreamCast' }
+		return bitmovinApi.streams.video.create(requestData)
+	} catch (e: any) {
+		console.error(e)
+		return new Error('Something went wrong')
+	}
 }
 
 function stopCapture() {
-  mediaRecorder.stop();
+	mediaRecorder.stop()
 }

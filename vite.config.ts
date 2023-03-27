@@ -6,20 +6,20 @@ import manifest from './src/manifest'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  return {
-    build: {
-      emptyOutDir: true,
-      outDir: 'build',
-      rollupOptions: {
-        output: {
-          chunkFileNames: 'assets/chunk-[hash].js',
-        },
-        input: {
-          record: 'record_screen.html',
-        },
-      },
-    },
+	return {
+		build: {
+			emptyOutDir: true,
+			outDir: 'build',
+			rollupOptions: {
+				output: {
+					chunkFileNames: 'assets/chunk-[hash].js',
+				},
+				input: {
+					record: 'record_screen.html',
+				},
+			},
+		},
 
-    plugins: [crx({ manifest }), react()],
-  }
+		plugins: [crx({ manifest }), react()],
+	}
 })
